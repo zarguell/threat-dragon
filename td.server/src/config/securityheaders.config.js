@@ -14,7 +14,7 @@ const config = (app, forceSecure) => {
     app.use(helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: ["'none'"],
-            scriptSrc: ["'self'", "'unsafe-eval'"],
+            scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"], //needed for oauth
             connectSrc: ["'self'"],
             styleSrc: ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"], //needed for jquery
             imgSrc: ["'self'", 'data:'],
