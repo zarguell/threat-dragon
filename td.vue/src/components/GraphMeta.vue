@@ -13,6 +13,7 @@
                     {{ $t('threatmodel.threats') }}
 
                     <b-btn
+                        :disabled="disableNewThreat"
                         @click="newThreat()"
                         v-if="!!cellRef"
                         variant="primary"
@@ -40,6 +41,7 @@
                                     :type="threat.type"
                                     :mitigation="threat.mitigation"
                                     :modelType="threat.modelType"
+                                    :number=threat.number
                                     @threatSelected="threatSelected" />
                             </b-col>
                         </b-row>
@@ -75,7 +77,7 @@
 <script>
 import { mapState } from 'vuex';
 
-import { createNewThreat } from '@/service/threats/index.js';
+import { createNewTypedThreat } from '@/service/threats/index.js';
 import { CELL_DATA_UPDATED } from '@/store/actions/cell.js';
 import dataChanged from '@/service/x6/graph/data-changed.js';
 import TdGraphProperties from '@/components/GraphProperties.vue';
@@ -86,6 +88,10 @@ export default {
     computed: mapState({
         cellRef: (state) => state.cell.ref,
         threats: (state) => state.cell.threats,
+        diagram: (state) => state.threatmodel.selectedDiagram,
+        disableNewThreat: function (state) {
+            return state.cell.ref.data.outOfScope || state.cell.ref.data.isTrustBoundary || state.cell.ref.data.type === 'tm.Text';
+        }
     }),
     components: {
         TdGraphProperties,
@@ -96,7 +102,7 @@ export default {
             this.$emit('threatSelected', threatId);
         },
         newThreat() {
-            const threat = createNewThreat();
+            const threat = createNewTypedThreat(this.diagram.diagramType, this.cellRef.data.type);
             this.cellRef.data.threats.push(threat);
             this.cellRef.data.hasOpenThreats = this.cellRef.data.threats.length > 0;
             this.$store.dispatch(CELL_DATA_UPDATED, this.cellRef.data);

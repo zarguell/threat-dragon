@@ -1109,11 +1109,13 @@ export default {
                 ],
                 'version': '2.0',
                 'title': 'Main Request Data Flow',
-                'thumbnail': './public/content/images/thumbnail.jpg',
+                'thumbnail': './public/content/images/thumbnail.stride.jpg',
+                'diagramType': 'STRIDE',
                 'id': 0
             }
         ],
-        'reviewer': 'Jane Smith'
+        'reviewer': 'Jane Smith',
+        'threatTop': 0
     },
     'version': '2.0'
 };

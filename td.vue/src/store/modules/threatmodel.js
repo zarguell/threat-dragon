@@ -15,7 +15,8 @@ import {
     THREATMODEL_RESTORE,
     THREATMODEL_SAVE,
     THREATMODEL_SELECTED,
-    THREATMODEL_SET_IMMUTABLE_COPY
+    THREATMODEL_SET_IMMUTABLE_COPY,
+    THREATMODEL_UPDATE
 } from '../actions/threatmodel.js';
 import save from '../../service/save.js';
 import threatmodelApi from '../../service/api/threatmodelApi.js';
@@ -79,13 +80,8 @@ const actions = {
         }
         commit(THREATMODEL_RESTORE, originalModel);
     },
-    [THREATMODEL_SET_IMMUTABLE_COPY]: ({ commit }) => commit(THREATMODEL_SET_IMMUTABLE_COPY),
     [THREATMODEL_SAVE]: async ({ dispatch, rootState, state }) => {
         try {
-            // TODO: This ONLY works if the backend provider is GitHub
-            // We need a separate code flow for localSession
-            // localSession needs to handle both a "download" type feature as well as saving to disk in electron
-
             if (getProviderType(rootState.provider.selected) !== providerTypes.local) {
                 await threatmodelApi.updateAsync(
                     rootState.repo.selected,
@@ -93,22 +89,29 @@ const actions = {
                     state.data.summary.title,
                     state.data
                 );
+                Vue.$toast.success(i18n.get().t('threatmodel.saved'));
             } else {
+                console.log('save without an existing fileHandle');
                 save.local(state.data, `${state.data.summary.title}.json`);
             }
-            Vue.$toast.success(i18n.get().t('threatmodel.saved'));
             dispatch(THREATMODEL_SET_IMMUTABLE_COPY);
         } catch (ex) {
             console.error('Failed to update threat model!');
             console.error(ex);
             Vue.$toast.error(i18n.get().t('threatmodel.errors.save'));
         }
-    } 
+    },
+    [THREATMODEL_SET_IMMUTABLE_COPY]: ({ commit }) => commit(THREATMODEL_SET_IMMUTABLE_COPY),
+    [THREATMODEL_UPDATE]: ({ commit }, update) => commit(THREATMODEL_UPDATE, update)
 };
 
 const mutations = {
     [THREATMODEL_CLEAR]: (state) => clearState(state),
     [THREATMODEL_CREATE]: (state, threatModel) => setThreatModel(state, threatModel),
+    [THREATMODEL_CONTRIBUTORS_UPDATED]: (state, contributors) => {
+        state.data.detail.contributors.length = 0;
+        contributors.forEach((name, idx) => Vue.set(state.data.detail.contributors, idx, { name }));
+    },
     [THREATMODEL_DIAGRAM_SELECTED]: (state, diagram) => {
         state.selectedDiagram = diagram;
     },
@@ -116,25 +119,30 @@ const mutations = {
         const idx = state.data.detail.diagrams.findIndex(x => x.id === diagram.id);
         Vue.set(state, 'selectedDiagram', diagram);
         Vue.set(state.data.detail.diagrams, idx, diagram);
+        Vue.set(state.data, 'version', diagram.version);
         setThreatModel(state, state.data);
-
-        // TODO: This does NOT belong here, but is a placeholder until update/save are implemented
-        // https://github.com/OWASP/threat-dragon/issues/340
-        Vue.set(state.data, 'version', '2.0');
     },
     [THREATMODEL_FETCH]: (state, threatModel) => setThreatModel(state, threatModel),
     [THREATMODEL_FETCH_ALL]: (state, models) => {
         state.all.length = 0;
         models.forEach((model, idx) => Vue.set(state.all, idx, model));
     },
-    [THREATMODEL_SELECTED]: (state, threatModel) => setThreatModel(state, threatModel),
-    [THREATMODEL_CONTRIBUTORS_UPDATED]: (state, contributors) => {
-        state.data.detail.contributors.length = 0;
-        contributors.forEach((name, idx) => Vue.set(state.data.detail.contributors, idx, { name }));
-    },
     [THREATMODEL_RESTORE]: (state, originalThreatModel) => setThreatModel(state, originalThreatModel),
+    [THREATMODEL_SELECTED]: (state, threatModel) => setThreatModel(state, threatModel),
     [THREATMODEL_SET_IMMUTABLE_COPY]: (state) => {
         Vue.set(state, 'immutableCopy', JSON.stringify(state.data));
+    },
+    [THREATMODEL_UPDATE]: (state, update) => {
+        if (update.version) {
+            Vue.set(state.data, 'version', update.version);
+        }
+        if (update.threatTop) {
+            Vue.set(state.data.detail, 'threatTop', update.threatTop);
+        }
+        if (update.fileHandle || update.fileName) {
+            Vue.set(state, 'fileHandle', update.fileHandle);
+            Vue.set(state, 'fileName', update.fileName);
+        }
     }
 };
 
@@ -147,7 +155,7 @@ const getters = {
         return contribs.map(x => x.name);
     },
     modelChanged: (state) => JSON.stringify(state.data) !== state.immutableCopy,
-    isV1Model: (state) => Object.keys(state.data).length > 0 && state.data.version !== '2.0'
+    isV1Model: (state) => Object.keys(state.data).length > 0 && (state.data.version == null || state.data.version.startsWith('1.'))
 };
 
 export default {

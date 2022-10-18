@@ -46,12 +46,12 @@ const edgeUpdater = (edge, color, dash, strokeWidth) => {
 
 const updateStyleAttrs = (cell) => {
     const cellData = cell.getData();
-    
+
     // New UI elements will not have any cell data
     if (!cellData) {
         return;
     }
-    
+
     cell.data.hasOpenThreats = threats.hasOpenThreats(cell.data);
 
     let { color, strokeDasharray, strokeWidth } = styles.default;
@@ -73,9 +73,15 @@ const updateStyleAttrs = (cell) => {
     if (cell.updateStyle) {
         cell.updateStyle(color, strokeDasharray, strokeWidth);
     }
+};
 
+const updateName = (cell) => {
+    if (cell.setName && cell.getData) {
+        cell.setName(cell.getData().name);
+    }
 };
 
 export default {
+    updateName,
     updateStyleAttrs
 };

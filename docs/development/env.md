@@ -25,8 +25,8 @@ ___
 1. [Generate Keys](#generating-keys) for encryption and JWT signing
 1. Copy `example.env` to `.env`
 1. Update the values in `.env`
-1. `npm install`
-1. `npm run serve`
+1. `pnpm install`
+1. `pnpm run serve`
 
 ___
 
@@ -106,7 +106,7 @@ services:
   threatdragon:
     # Always use a specific version tag, as "latest" may be a development build
     # Alternatively, you can use the "stable" tag, as that will always
-    # be the latest released version
+    # be the most recently released version
     image: threatdragon/owasp-threat-dragon:v1.6.0
     ports:
       - 3000:3000
@@ -170,7 +170,7 @@ ___
 | LOG_MAX_FILE_SIZE | Maximum size of the back-end express server log file, in MB | `24` |
 | NODE_ENV | The node environment, typically `test`, `production` or `development`.  The 'secure' cookie flag is set only if running in `production` mode | |
 | PORT | Defines the listening port for Threat Dragon's server, and used by Heroku | `3000`|
-| SERVER_API_PROTOCOL | The protocol used between Threat Dragon's server and frontend, used by Heroku (http/https) | `http` |
+| SERVER_API_PROTOCOL | The protocol used between Threat Dragon's server and frontend, used by Heroku: `http` / `https` | `https` |
 
 {:.table .table-striped}
 | Back-end specific variables | Description | Default |
@@ -188,11 +188,11 @@ A JWT is used as a refresh token because it is tamper resistant and provides use
 {:.table .table-striped}
 | Desktop specific variables | Description | Default |
 | --- | ----------- | ------- |
-| ELECTRON_NODE_INTEGRATION | Electron nodeIntegration is disabled by default, but can be enabled during development | |
-| IS_TEST | Enabled during testing, required for Spectron | |
-| WEBPACK_DEV_SERVER_URL | Load the url of the development server if in development mode | |
+| IS_TEST | Enabled during testing, required for Spectron | false |
+| WEBPACK_DEV_SERVER_URL | Server load URL when in development mode | http://localhost:3000/ |
 
-**Note:** generally no need to change the desktop environment variables except maybe during development / test
+**Note:** the desktop environment variable WEBPACK_DEV_SERVER_URL determines either development/test
+mode if defined of production mode if not defined
 
 ___
 ## Github OAuth App Screenshot

@@ -1,8 +1,8 @@
-﻿import express from 'express';
+import express from 'express';
 
 import auth from '../controllers/auth.js';
 import bearer from './bearer.config.js';
-import healthcheck from '../controllers/healthcheck.js';
+import healthcheck from '../controllers/healthz.js';
 import homeController from '../controllers/homecontroller.js';
 import threatmodelController from '../controllers/threatmodelcontroller.js';
 
@@ -17,9 +17,9 @@ const unauthRoutes = (router) => {
     router.get('/healthz', healthcheck.healthz);
 
     router.get('/api/login/:provider', auth.login);
+    router.get('/api/logout', auth.logout);
     router.get('/api/oauth/return', auth.oauthReturn);
     router.get('/api/oauth/:provider', auth.completeLogin);
-    router.post('/api/token/refresh', auth.refresh);
 };
 
 /**
@@ -30,12 +30,15 @@ const unauthRoutes = (router) => {
  */
 const routes = (router) => {
     router.post('/api/logout', auth.logout);
+    router.post('/api/token/refresh', auth.refresh);
+
     router.get('/api/threatmodel/repos', threatmodelController.repos);
     router.get('/api/threatmodel/:organisation/:repo/branches', threatmodelController.branches);
     router.get('/api/threatmodel/:organisation/:repo/:branch/models', threatmodelController.models);
     router.get('/api/threatmodel/:organisation/:repo/:branch/:model/data', threatmodelController.model);
-    
+
     router.delete('/api/threatmodel/:organisation/:repo/:branch/:model', threatmodelController.deleteModel);
+
     router.put('/api/threatmodel/:organisation/:repo/:branch/:model/create', threatmodelController.create);
     router.put('/api/threatmodel/:organisation/:repo/:branch/:model/update', threatmodelController.update);
 };
@@ -44,6 +47,7 @@ const config = (app) => {
     const router = express.Router();
     unauthRoutes(router);
 
+    // routes protected by authorization
     router.use(bearer.middleware);
     routes(router);
 

@@ -1,38 +1,72 @@
 import { v4 } from 'uuid';
 
 import models from './models/index.js';
+import { tc } from '../../i18n/index.js';
 
 const valuesToTranslations = {
-    'Confidentiality': 'threats.models.confidentiality',
-    'Integrity': 'threats.models.integrity',
-    'Availability': 'threats.models.availability',
-    'Linkability': 'threats.models.linkability',
-    'Identifiability': 'threats.models.identifiability',
-    'Non-repudiation': 'threats.models.nonRepudiation',
-    'Detectability': 'threats.models.detectability',
-    'Disclosure of information': 'threats.models.disclosureOfInformation',
-    'Unawareness': 'threats.models.unawareness',
-    'Non-compliance': 'threats.models.nonCompliance',
-    'Spoofing': 'threats.models.spoofing',
-    'Tampering': 'threats.models.tampering',
-    'Repudiation': 'threats.models.repudiation',
-    'Information disclosure': 'threats.models.informationDisclosure',
-    'Denial of service': 'threats.models.denialOfService',
-    'Elevation of privilege': 'threats.models.elevationOfPrivilege'
+    Confidentiality: 'threats.model.cia.confidentiality',
+    Integrity: 'threats.model.cia.integrity',
+    Availability: 'threats.model.cia.availability',
+    Linkability: 'threats.model.linddun.linkability',
+    Identifiability: 'threats.model.linddun.identifiability',
+    'Non-repudiation': 'threats.model.linddun.nonRepudiation',
+    Detectability: 'threats.model.linddun.detectability',
+    'Disclosure of information': 'threats.model.linddun.disclosureOfInformation',
+    Unawareness: 'threats.model.linddun.unawareness',
+    'Non-compliance': 'threats.model.linddun.nonCompliance',
+    Spoofing: 'threats.model.stride.spoofing',
+    Tampering: 'threats.model.stride.tampering',
+    Repudiation: 'threats.model.stride.repudiation',
+    'Information disclosure': 'threats.model.stride.informationDisclosure',
+    'Denial of service': 'threats.model.stride.denialOfService',
+    'Elevation of privilege': 'threats.model.stride.elevationOfPrivilege'
 };
 
 const convertToTranslationString = (val) => valuesToTranslations[val];
 
-export const createNewThreat = () => ({
-    id: v4(),
-    status: '',
-    severity: '',
-    title: '',
-    type: '',
-    description: '',
-    mitigation: '',
-    modelType: ''
-});
+export const createNewTypedThreat = function (modelType, cellType) {
+    if (!modelType) {
+        modelType = 'STRIDE';
+    }
+    let title, type;
+
+    switch (modelType) {
+    case 'CIA':
+        title = tc('threats.generic.cia');
+        type = tc('threats.model.cia.confidentiality');
+        break;
+    case 'LINDDUN':
+        title = tc('threats.generic.linddun');
+        type = tc('threats.model.linddun.linkability');
+        break;
+    case 'STRIDE':
+        title = tc('threats.generic.stride');
+        if (cellType === 'tm.Actor' || cellType === 'tm.Process') {
+            type = tc('threats.model.stride.spoofing');
+        } else {
+            type = tc('threats.model.stride.tampering');
+        }
+        break;
+    default:
+        title = tc('threats.generic.default');
+        type = tc('threats.model.stride.spoofing');
+        break;
+    }
+
+    return {
+        id: v4(),
+        title,
+        status: 'Open',
+        severity: 'Medium',
+        type,
+        description: tc('threats.description'),
+        mitigation: tc('threats.mitigation'),
+        modelType,
+        new: true,
+        number: 0,
+        score: ''
+    };
+};
 
 const hasOpenThreats = (data) => !!data && !!data.threats &&
     data.threats.filter(x => x.status.toLowerCase() === 'open').length > 0;
@@ -57,7 +91,6 @@ const filterForDiagram = (data, filters) => {
 
     return data.threats.filter(x => filters.showMitigated || x.status.toLowerCase() !== 'mitigated');
 };
-
 
 export default {
     convertToTranslationString,

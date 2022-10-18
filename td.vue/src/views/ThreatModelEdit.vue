@@ -84,7 +84,7 @@
 
                     <b-form-row>
                         <b-col>
-                            <h5>{{ $t('threatmodel.diagrams') }}</h5>
+                            <h5>{{ $t('threatmodel.diagram.diagrams') }}</h5>
                         </b-col>
                     </b-form-row>
 
@@ -98,6 +98,14 @@
                                 :label-for="`diagram-${idx}`"
                                 class="mb-3"
                             >
+                                <b-input-group-prepend>
+                                    <b-dropdown split variant="secondary" class="select-diagram-type" :text="model.detail.diagrams[idx].diagramType">
+                                        <b-dropdown-item-button @click="onDiagramTypeClick(idx, 'CIA')">{{ $t('threatmodel.diagram.cia.select') }}</b-dropdown-item-button>
+                                        <b-dropdown-item-button @click="onDiagramTypeClick(idx, 'LINDDUN')">{{ $t('threatmodel.diagram.linddun.select') }}</b-dropdown-item-button>
+                                        <b-dropdown-item-button @click="onDiagramTypeClick(idx, 'STRIDE')">{{ $t('threatmodel.diagram.stride.select') }}</b-dropdown-item-button>
+                                        <b-dropdown-item-button @click="onDiagramTypeClick(idx, 'Generic')">{{ $t('threatmodel.diagram.generic.select') }}</b-dropdown-item-button>
+                                    </b-dropdown>
+                                </b-input-group-prepend>
                                 <b-form-input
                                     v-model="model.detail.diagrams[idx].title"
                                     type="text"
@@ -115,7 +123,7 @@
                         <b-col md=6>
                             <a href="javascript:void(0)" @click="onAddDiagramClick" class="add-diagram-link m-2">
                                 <font-awesome-icon icon="plus"></font-awesome-icon>
-                                {{ $t('threatmodel.addNewDiagram') }}
+                                {{ $t('threatmodel.diagram.addNewDiagram') }}
                             </a>
                         </b-col>
                     </b-form-row>
@@ -156,7 +164,11 @@
 }
 
 .remove-diagram-btn {
-    font-size: 14px;
+    font-size: 12px;
+}
+
+select-diagram-type {
+    font-size: 12px;
 }
 </style>
 
@@ -175,7 +187,8 @@ export default {
     computed: {
         ...mapState({
             model: (state) => state.threatmodel.data,
-            providerType: state => getProviderType(state.provider.selected)
+            providerType: state => getProviderType(state.provider.selected),
+            version: state => state.packageBuildVersion
         }),
         contributors: {
             get() {
@@ -207,7 +220,45 @@ export default {
         },
         onAddDiagramClick(evt) {
             evt.preventDefault();
-            this.model.detail.diagrams.push({ name: '' });
+            let newDiagram = {
+                name: '',
+                title: this.$t('threatmodel.diagram.stride.diagramTitle'),
+                diagramType: 'STRIDE',
+                thumbnail: './public/content/images/thumbnail.stride.jpg',
+                version: this.version
+            };
+            this.model.detail.diagrams.push(newDiagram);
+        },
+        onDiagramTypeClick(idx, type) {
+            let title;
+            switch (type) {
+            case 'CIA':
+                this.model.detail.diagrams[idx].thumbnail = './public/content/images/thumbnail.cia.jpg';
+                title = this.$t('threatmodel.diagram.cia.diagramTitle');
+                break;
+            case 'LINDDUN':
+                this.model.detail.diagrams[idx].thumbnail = './public/content/images/thumbnail.linddun.jpg';
+                title = this.$t('threatmodel.diagram.linddun.diagramTitle');
+                break;
+            case 'STRIDE':
+                this.model.detail.diagrams[idx].thumbnail = './public/content/images/thumbnail.stride.jpg';
+                title = this.$t('threatmodel.diagram.stride.diagramTitle');
+                break;
+            default:
+                this.model.detail.diagrams[idx].thumbnail = './public/content/images/thumbnail.jpg';
+                title = this.$t('threatmodel.diagram.generic.diagramTitle');
+                type = this.$t('threatmodel.diagram.generic.select');
+                break;
+            }
+            this.model.detail.diagrams[idx].diagramType = type;
+            // if the diagram title is still generic, then change it to the new generic title
+            if (this.model.detail.diagrams[idx].title === this.$t('threatmodel.diagram.cia.diagramTitle')
+                || this.model.detail.diagrams[idx].title === this.$t('threatmodel.diagram.linddun.diagramTitle')
+                || this.model.detail.diagrams[idx].title === this.$t('threatmodel.diagram.stride.diagramTitle')
+                || this.model.detail.diagrams[idx].title === this.$t('threatmodel.diagram.generic.diagramTitle')
+            ) {
+                this.model.detail.diagrams[idx].title = title;
+            }
         },
         onRemoveDiagramClick(idx) {
             this.model.detail.diagrams.splice(idx, 1);

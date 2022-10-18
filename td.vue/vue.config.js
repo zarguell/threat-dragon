@@ -26,10 +26,14 @@ module.exports = {
             ]
         },
         electronBuilder: {
-            mainProcessFile: './src/desktop.js',
+            mainProcessFile: './src/desktop/desktop.js',
+            outputDir: 'dist-desktop',
             builderOptions: {
                 appId: 'org.owasp.threatdragon',
                 productName: 'OWASP-Threat-Dragon',
+                directories: {
+                    output: 'dist-desktop'
+                },
                 publish: {
                     provider: 'github'
                 },

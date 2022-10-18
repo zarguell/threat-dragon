@@ -1,4 +1,4 @@
-describe('upgrade', () => {
+describe('upgrade v1 demo', () => {
     before(() => {
         cy.setupTest();
         cy.get('#local-login-btn').click();
@@ -11,14 +11,6 @@ describe('upgrade', () => {
 
     it('has the Demo Threat Model', () => {
         cy.contains('Demo Threat Model');
-    });
-
-    it('has the legacy desktop model', () => {
-        cy.contains('Legacy Desktop Model');
-    });
-
-    it('has the Legacy Model', () => {
-        cy.contains('Legacy Model');
     });
 
     it('opens the demo threat model', () => {
@@ -50,6 +42,18 @@ describe('upgrade', () => {
         cy.get('.td-instructions').contains('your model');
         cy.get('.td-upgrade-continue').click();
         cy.url().should('contain', 'local/Demo%20Threat%20Model');
+    });
+
+    it('can edit the model', () => {
+        cy.get('#tm-edit-btn').click();
+        cy.url().should('contain', '/edit');
+        cy.get('#description').should('be.visible');
+        cy.get('button').contains('Cancel').click();
+    });
+
+    it('can edit the diagram', () => {
+        cy.get('.td-diagram-thumb').click();
+        cy.url().should('contain', '/edit/Main%20Request%20Data%20Flow');
     });
 
 });

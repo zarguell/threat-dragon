@@ -7,9 +7,8 @@
             ok-variant="primary"
             header-bg-variant="primary"
             header-text-variant="light"
-            :title="$t('threats.edit')"
+            :title="modalTitle"
             ref="editModal"
-            @hidden="updateData"
         >
             <b-form>
                 <b-form-row>
@@ -31,21 +30,6 @@
                 <b-form-row>
                     <b-col>
                         <b-form-group
-                            id="model-type-group"
-                            :label="$t('threats.properties.modelType')"
-                            label-for="model-type">
-                            <b-form-select
-                                id="model-type"
-                                v-model="threat.modelType"
-                                :options="modelTypes">
-                            </b-form-select>
-                        </b-form-group>
-                    </b-col>
-                </b-form-row>
-
-                <b-form-row>
-                    <b-col>
-                        <b-form-group
                             id="threat-type-group"
                             :label="$t('threats.properties.type')"
                             label-for="threat-type">
@@ -59,29 +43,46 @@
                 </b-form-row>
 
                 <b-form-row>
-                    <b-col md=6>
+                    <b-col md=5>
                         <b-form-group
                             id="status-group"
+                            class="float-left"
                             :label="$t('threats.properties.status')"
                             label-for="status">
-                            <b-form-select
+                            <b-form-radio-group
                                 id="status"
                                 v-model="threat.status"
-                                :options="statuses">
-                            </b-form-select>
+                                :options="statuses"
+                                buttons
+                            ></b-form-radio-group>
                         </b-form-group>
                     </b-col>
 
-                    <b-col md=6>
+                    <b-col md=2>
+                        <b-form-group
+                            id="score-group"
+                            :label="$t('threats.properties.score')"
+                            label-for="score">
+                            <b-form-input
+                                id="score"
+                                v-model="threat.score"
+                                type="text"
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+
+                    <b-col md=5>
                         <b-form-group
                             id="priority-group"
+                            class="float-right"
                             :label="$t('threats.properties.priority')"
                             label-for="priority">
-                            <b-form-select
+                            <b-form-radio-group
                                 id="priority"
                                 v-model="threat.severity"
-                                :options="priorities">
-                            </b-form-select>
+                                :options="priorities"
+                                buttons
+                            ></b-form-radio-group>
                         </b-form-group>
                     </b-col>
                 </b-form-row>
@@ -120,18 +121,35 @@
             <template #modal-footer>
                 <div class="w-100">
                 <b-button
-                    variant="secondary"
-                    class="float-right"
-                    @click="hideModal()"
-                >
-                    {{ $t('forms.close') }}
-                </b-button>
-                <b-button
+                    v-if="!newThreat"
                     variant="danger"
                     class="float-left"
                     @click="confirmDelete()"
                 >
                     {{ $t('forms.delete') }}
+                </b-button>
+                <b-button
+                    v-if="newThreat"
+                    variant="danger"
+                    class="float-left"
+                    @click="immediateDelete()"
+                >
+                    {{ $t('forms.remove') }}
+                </b-button>
+                 <b-button
+                    variant="secondary"
+                    class="float-right"
+                    @click="updateThreat()"
+                >
+                    {{ $t('forms.apply') }}
+                </b-button>
+                <b-button
+                    v-if="!newThreat"
+                    variant="secondary"
+                    class="float-right"
+                    @click="hideModal()"
+                >
+                    {{ $t('forms.cancel') }}
                 </b-button>
                 </div>
             </template>
@@ -143,7 +161,7 @@
 import { mapState } from 'vuex';
 
 import { CELL_DATA_UPDATED } from '@/store/actions/cell.js';
-import { createNewThreat } from '@/service/threats/index.js';
+import { THREATMODEL_UPDATE } from '@/store/actions/threatmodel.js';
 import dataChanged from '@/service/x6/graph/data-changed.js';
 import threatModels from '@/service/threats/models/index.js';
 
@@ -151,7 +169,8 @@ export default {
     name: 'TdThreatEditModal',
     computed: {
         ...mapState({
-            cellRef: (state) => state.cell.ref
+            cellRef: (state) => state.cell.ref,
+            threatTop: (state) => state.threatmodel.data.detail.threatTop
         }),
         threatTypes() {
             if (!this.threat || !this.threat.modelType) {
@@ -159,7 +178,7 @@ export default {
             }
 
             const res = [];
-            const threatTypes = threatModels.getThreatTypes(this.threat.modelType);
+            const threatTypes = threatModels.getThreatTypesByElement(this.threat.modelType, this.cellRef.data.type);
             Object.keys(threatTypes).forEach((type) => {
                 res.push(this.$t(threatTypes[type]));
             }, this);
@@ -167,7 +186,6 @@ export default {
         },
         statuses() {
             return [
-                { value: '', text: '' },
                 { value: 'NotApplicable', text: this.$t('threats.status.notApplicable') },
                 { value: 'Open', text: this.$t('threats.status.open') },
                 { value: 'Mitigated', text: this.$t('threats.status.mitigated') }
@@ -175,12 +193,12 @@ export default {
         },
         priorities() {
             return [
-                { value: '', text: '' },
                 { value: 'Low', text: this.$t('threats.priority.low') },
                 { value: 'Medium', text: this.$t('threats.priority.medium') },
                 { value: 'High', text: this.$t('threats.priority.high') }
             ];
-        }
+        },
+        modalTitle() { return this.$t('threats.edit') + ' #' + this.number; }
     },
     data() {
         return {
@@ -189,19 +207,33 @@ export default {
                 'CIA',
                 'LINDDUN',
                 'STRIDE'
-            ]
+            ],
+            newThreat: true,
+            number: 0
         };
     },
     methods: {
-        show(threatId) {
+        showModal(threatId) {
             this.threat = this.cellRef.data.threats.find(x => x.id === threatId);
             if (!this.threat) {
-                this.threat = createNewThreat();
+                // this should never happen with a valid threatId
+                console.warn('Trying to access a non-existent threatId: ' + threatId);
+            } else {
+                this.$refs.editModal.show();
             }
-            this.$refs.editModal.show();
+            this.newThreat = this.threat.new;
+
+            if (this.threat.new) {
+                // provide a threat number that is unique project wide
+                if (this.threatTop) {
+                    this.number = this.threatTop + 1;
+                } else {
+                    this.number = 1;
+                }
+            }
         },
-        updateData() {
-            const threatRef = this.cellRef.data.threats.find(x => x.id === this.threat.id);
+        updateThreat() {
+            const threatRef = this.threat;
 
             if (threatRef) {
                 threatRef.status = this.threat.status;
@@ -211,10 +243,21 @@ export default {
                 threatRef.description = this.threat.description;
                 threatRef.mitigation = this.threat.mitigation;
                 threatRef.modelType = this.threat.modelType;
-                
+                threatRef.new = false;
+                threatRef.number = this.number;
+                threatRef.score = this.threat.score;
+
                 this.$store.dispatch(CELL_DATA_UPDATED, this.cellRef.data);
                 dataChanged.updateStyleAttrs(this.cellRef);
             }
+            this.$store.dispatch(THREATMODEL_UPDATE, { threatTop: this.number });
+            this.hideModal();
+        },
+        deleteThreat() {
+            this.cellRef.data.threats = this.cellRef.data.threats.filter(x => x.id !== this.threat.id);
+            this.cellRef.data.hasOpenThreats = this.cellRef.data.threats.length > 0;
+            this.$store.dispatch(CELL_DATA_UPDATED, this.cellRef.data);
+            dataChanged.updateStyleAttrs(this.cellRef);
         },
         hideModal() {
             this.$refs.editModal.hide();
@@ -229,11 +272,11 @@ export default {
 
             if (!confirmed) { return; }
 
-            this.cellRef.data.threats = this.cellRef.data.threats.filter(x => x.id !== this.threat.id);
-            this.cellRef.data.hasOpenThreats = this.cellRef.data.threats.length > 0;
-            this.$store.dispatch(CELL_DATA_UPDATED, this.cellRef.data);
-            dataChanged.updateStyleAttrs(this.cellRef);
-
+            this.deleteThreat();
+            this.hideModal();
+        },
+        async immediateDelete() {
+            this.deleteThreat();
             this.hideModal();
         }
     }

@@ -12,40 +12,50 @@ pnpm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+pnpm serve
 ```
 
 ### Compiles and minifies for production
 ```
-npm run build
+pnpm build
 ```
 
 ### Builds the desktop application
 ```
-npm run electron:build
+pnpm run electron:build
 ```
 
 ### Runs the desktop application for development
 ```
-npm run electron:serve
+pnpm run electron:serve
 ```
 
-### Run your unit tests
+Clean the distribution with
 ```
-npm run test:unit
+pnpm clean
+```
+
+### Run unit tests
+```
+pnpm test
 ```
 For continuous testing:
 ```
-npm run test:unit -- --watch
+pnpm run test:unit -- --watch
 ```
 Jest coverage will only show coverage for files containing executable javascript.
 This means that vue components without any JS logic will not be included in the coverage report.
 This is a known limitation, so if you are reading this and there is a workaround
 or you know of another way of getting better coverage for `.vue` files, please open an issue or submit a PR! :)
 
+### Run e2e tests
+```
+pnpm run test:e2e
+```
+
 ### Lints and fixes files
 ```
-npm run lint
+pnpm run lint
 ```
 
 ## Styles

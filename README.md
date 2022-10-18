@@ -18,13 +18,16 @@ It is used to draw threat modeling diagrams and to list threats for elements in 
 [Mike Goodwin](https://github.com/mike-goodwin) created Threat Dragon as an open source community project
 that provides an intuitive and accessible way to model threats.
 
-Threat Dragon is designed to be accessible for various types of teams, with an emphasis on flexibility and simplicity.
+[Threat Dragon](https://threatdragon.github.io/about)
+is designed to be accessible for various types of teams, with an emphasis on flexibility and simplicity.
 It is an [OWASP Lab Project](https://www.owasp.org/index.php/OWASP_Threat_Dragon)
 and follows the values and principles of the [threat modeling manifesto](https://www.threatmodelingmanifesto.org/).
 
 ## Check it out
-Try the Threat Dragon version 2.0 snapshot on [our website](https://www.threatdragon.com/#/), or watch the video
-provided by the [OWASP Spotlight](https://www.youtube.com/playlist?list=PLUKo5k_oSrfOTl27gUmk2o-NBKvkTGw0T) series.
+There are [documentation pages](https://threatdragon.github.io/about) to guide you and the production release area, conforming to
+[semver](https://semver.org/spec/v2.0.0.html), contains the Threat Dragon 1.x releases.
+The next version of Threat Dragon 2.0 is still in development, but you can try the snapshot on [our website](https://www.threatdragon.com/#/).
+Also well worth watching the video provided by the [OWASP Spotlight](https://www.youtube.com/playlist?list=PLUKo5k_oSrfOTl27gUmk2o-NBKvkTGw0T) series.
 
 ### Version 1.x Maintenance mode
 Threat Dragon was originally written using AngularJS version 1.x, which is reaching end of life.
@@ -33,7 +36,7 @@ The main branch is now for version 2.x+, which is currently unreleased.
 For more information on building/running version 1.x,
 please see the [legacy-v1.x branch](https://github.com/OWASP/threat-dragon/tree/legacy-v1.x).
 
-The [release area](https://github.com/OWASP/threat-dragon/releases) has the version 1.x downlaods and this will migrate to version 2.x during 2022. 
+The [release area](https://github.com/OWASP/threat-dragon/releases) has the version 1.x downloads and this will migrate to version 2.x during 2022. 
 
 ## About Threat Dragon
 There is a good overview of [threat modeling and risk assessment](https://owasp.org/www-community/Application_Threat_Modeling)
@@ -96,15 +99,15 @@ Specify this using environment variable `SERVER_API_PROTOCOL=http` in the dotenv
 ### Run the application
 
 When running on Windows, and during development, the front-end and back-end
-can be started separately in "watch" mode using commands : `npm run dev:server` and `npm run dev:vue`.
+can be started separately in "watch" mode using commands : `pnpm dev:server` and `pnpm dev:vue`.
 Alternatively, if running on Linux or MacOS, start both the back-end server and the front-end application
-from the top directory using : `npm start`.
+from the top directory using : `pnpm start`.
 
 With both front and back end running, access with a browser at http://localhost:8080/
 
 ### Stop the application
 
-If using `npm start`, stop both the back-end server and the front-end application from the top directory: `npm stop`.
+If using `pnpm start`, stop both the back-end server and the front-end application from the top directory: `pnpm stop`.
 Otherwise break out of both the server and vue front-end.
 
 ### Docker (local build)

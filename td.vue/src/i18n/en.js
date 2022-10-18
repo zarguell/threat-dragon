@@ -14,7 +14,7 @@ const en = {
     },
     providers: {
         github: {
-            displayName: 'GitHub',
+            displayName: 'GitHub'
         },
         local: {
             displayName: 'Local Session'
@@ -35,6 +35,24 @@ const en = {
     demo: {
         select: 'Select a demo threat model from the list below'
     },
+    desktop: {
+        file: {
+            heading: 'File',
+            close: 'Close Model',
+            open: 'Open Model',
+            save: 'Save Model',
+            saveAs: 'Save Model As'
+        },
+        help: {
+            heading: 'Help',
+            docs: 'Documentation',
+            visit: 'Visit us at OWASP',
+            sheets: 'OWASP Cheat Sheets',
+            github: 'Visit us on GitHub',
+            submit: 'Submit an Issue',
+            check: 'Check for updates ...'
+        }
+    },
     repository: {
         select: 'Select a',
         from: 'repository from the list below',
@@ -54,22 +72,45 @@ const en = {
         newThreatModel: 'Create a New Threat Model'
     },
     threatmodel: {
-        jsonPaste: 'Paste the JSON of your threat model here:',
-        invalidJson: 'Invalid JSON. Please check your model and try again.',
+        contributors: 'Contributors',
+        contributorsPlaceholder: 'Start typing to add a contributor',
+        description: 'High level system description',
+        dragAndDrop: 'Drag and drop or ',
+        editing: 'Editing',
+        jsonPaste: 'Drop a threat model JSON file or paste its content here:',
         owner: 'Owner',
         reviewer: 'Reviewer',
-        contributors: 'Contributors',
-        contributorsPlaceholder: 'Add a new contributor',
-        description: 'High level system description',
-        editing: 'Editing',
         title: 'Title',
-        diagrams: 'Diagrams',
-        addNewDiagram: 'Add a new diagram...',
+        diagram: {
+            diagrams: 'Diagrams',
+            addNewDiagram: 'Add a new diagram...',
+            generic: {
+                diagramTitle: 'New generic diagram',
+                select: 'Generic'
+            },
+            stride: {
+                diagramTitle: 'New STRIDE diagram',
+                select: 'STRIDE'
+            },
+            linddun: {
+                diagramTitle: 'New LINDDUN diagram',
+                select: 'LINDDUN'
+            },
+            cia: {
+                diagramTitle: 'New CIA diagram',
+                select: 'CIA'
+            }
+        },
         threats: 'Threats',
         errors: {
-            save: 'Error saving Threat Model. Please check the developer console for more information'
+            dropSingleFileOnly: 'Drag and drop requires a single file.',
+            invalidJson: 'Invalid JSON. Please check your model and try again.',
+            onlyJsonAllowed: 'Only files that end with .json are supported.',
+            open: 'Error opening this Threat Model. Check the developer console for more information',
+            save: 'Error saving the Threat Model. Check the developer console for more information'
         },
-        saved: 'Threat model successfully saved!',
+        opened: 'Threat model successfully opened',
+        saved: 'Threat model successfully saved',
         properties: {
             title: 'Properties',
             emptyState: 'Select an element on the graph to edit',
@@ -88,12 +129,13 @@ const en = {
             publicNetwork: 'Public Network'
         },
         buttons: {
-            shortcuts: 'Keyboard Shortcuts',
-            undo: 'Undo',
-            redo: 'Redo',
-            zoomIn: 'Zoom In',
-            zoomOut: 'Zoom Out',
-            toggleGrid: 'Toggle Grid'
+            delete: 'Delete selected',
+            redo: 'Redo edit',
+            shortcuts: 'Keyboard shortcuts',
+            toggleGrid: 'Toggle grid',
+            undo: 'Undo edit',
+            zoomIn: 'Zoom in',
+            zoomOut: 'Zoom out'
         },
         shortcuts: {
             title: 'Shortcuts',
@@ -131,82 +173,103 @@ const en = {
             }
         },
         stencil: {
-            entities: 'Entities',
             boundaries: 'Boundaries',
+            components: 'Components',
+            entities: 'Entities',
             metadata: 'Metadata',
             search: 'Search',
             notFound: 'We don\'t have that yet, want to open an issue? :)'
         },
         shapes: {
             actor: 'Actor',
-            flowStencil: 'Data Flow',
             flow: 'Data Flow',
+            flowStencil: 'Data Flow',
             process: 'Process',
             store: 'Store',
-            text: 'Arbitrary Text',
+            text: 'Descriptive text',
             trustBoundary: 'Trust Boundary'
         }
     },
     forms: {
-        edit: 'Edit',
-        report: 'Report',
+        apply: 'Apply',
+        cancel: 'Cancel',
+        close: 'Close',
+        closeModel: 'Close Model',
         delete: 'Delete',
+        discardTitle: 'Discard Changes?',
+        discardMessage: 'Are you sure you want to discard your changes?',
+        edit: 'Edit',
+        import: 'Import',
+        ok: 'OK',
         open: 'Open',
         openModel: 'Open Model',
+        print: 'Print',
+        reload: 'Reload',
         remove: 'Remove',
+        report: 'Report',
         save: 'Save',
         saveAs: 'Save As',
         saveModel: 'Save Model',
         saveModelAs: 'Save Model As',
-        reload: 'Reload',
-        cancel: 'Cancel',
-        close: 'Close',
-        closeModel: 'Close Model',
-        search: 'Search',
-        import: 'Import',
-        ok: 'OK',
-        discardTitle: 'Discard Changes?',
-        discardMessage: 'Are you sure you want to discard your changes?',
-        print: 'Print',
-        savePdf: 'Save PDF'
+        savePdf: 'Save PDF',
+        search: 'Search'
     },
     threats: {
-        models: {
-            confidentiality: 'Confidentiality',
-            integrity: 'Integrity',
-            availability: 'Availability',
-            linkability: 'Linkability',
-            identifiability: 'Identifiability',
-            nonRepudiation: 'Non-repudiation',
-            detectability: 'Detectability',
-            disclosureOfInformation: 'Disclosure of information',
-            unawareness: 'Unawareness',
-            nonCompliance: 'Non-compliance',
-            spoofing: 'Spoofing',
-            tampering: 'Tampering',
-            repudiation: 'Repudiation',
-            informationDisclosure: 'Information disclosure',
-            denialOfService: 'Denial of service',
-            elevationOfPrivilege: 'Elevation of privilege'
+        model: {
+            cia: {
+                header: '--- CIA ---',
+                confidentiality: 'Confidentiality',
+                integrity: 'Integrity',
+                availability: 'Availability'
+            },
+            linddun: {
+                header: '--- LINDDUN ---',
+                linkability: 'Linkability',
+                identifiability: 'Identifiability',
+                nonRepudiation: 'Non-repudiation',
+                detectability: 'Detectability',
+                disclosureOfInformation: 'Disclosure of information',
+                unawareness: 'Unawareness',
+                nonCompliance: 'Non-compliance'
+            },
+            stride: {
+                header: '--- STRIDE ---',
+                spoofing: 'Spoofing',
+                tampering: 'Tampering',
+                repudiation: 'Repudiation',
+                informationDisclosure: 'Information disclosure',
+                denialOfService: 'Denial of service',
+                elevationOfPrivilege: 'Elevation of privilege'
+            }
+        },
+        generic: {
+            default: 'New generic threat',
+            cia: 'New CIA threat',
+            linddun: 'New LINDDUN threat',
+            stride: 'New STRIDE threat'
         },
         edit: 'Edit Threat',
         confirmDeleteTitle: 'Confirm Delete',
         confirmDeleteMessage: 'Are you sure you really want to delete this threat?',
+        description: 'Provide a description for this threat',
         emptyThreat: 'Select an element on the graph to add a threat',
+        mitigation: 'Provide mitigation or prevention for this threat',
         newThreat: 'New Threat',
         newThreatByType: 'New Threat by Type',
         newThreatByContext: 'New Threat by Context',
         properties: {
-            title: 'Title',
-            status: 'Status',
-            priority: 'Priority',
-            type: 'Type',
             description: 'Description',
             mitigation: 'Mitigations',
-            modelType: 'Model Type'
+            modelType: 'Model Type',
+            number: 'Number',
+            priority: 'Priority',
+            score: 'Score',
+            status: 'Status',
+            title: 'Title',
+            type: 'Type'
         },
         status: {
-            notApplicable: 'Not Applicable',
+            notApplicable: 'N/A',
             open: 'Open',
             mitigated: 'Mitigated'
         },
@@ -235,7 +298,7 @@ const en = {
             openHigh: 'Open / High Priority',
             openMedium: 'Open / Medium Priority',
             openLow: 'Open / Low Priority',
-            openUnknown: 'Open / Unknown Priority',
+            openUnknown: 'Open / Unknown Priority'
         }
     },
     upgrade: {

@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 
@@ -15,46 +15,46 @@ import { upDir } from './helpers/path.helper.js';
 const siteDir = path.join(__dirname, upDir, upDir, 'dist');
 const docsDir = path.join(__dirname, upDir, upDir, 'docs');
 
-// set up rate limiter: maximum of 100 requests per 15 minutes
+// set up rate limiter: maximum of 300 requests per 15 minutes
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    max: 300,
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
 
 const create = () => {
     let logger;
 
     try {
-        // logging environment
         envConfig.tryLoadDotEnv();
+        // logging environment
         loggerHelper.level(env.get().config.LOG_LEVEL || 'info');
         logger = loggerHelper.get('app.js');
 
         const app = expressHelper.getInstance();
         app.set('trust proxy', true);
         // rate limiting only for production environemnts, otherwise automated e2e tests fail
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV !== 'development') {
             app.use(limiter);
         } else {
-            logger.warn('Rate limiting only when running in production environments');
+            logger.warn('Rate limiting disabled for development environments');
         }
 
-        //security headers
+        // security headers
         securityHeaders.config(app);
 
         // Force HTTPS in production
         app.use(https.middleware);
 
-        //static content
+        // static content
         app.use('/public', express.static(siteDir));
         app.use('/docs', express.static(docsDir));
 
-        //parsers
+        // parsers
         parsers.config(app);
 
-        //routes
+        // routes
         routes.config(app);
 
         // if this default is changed then ensure docs are updated and CI pipeline ci.yaml still works
@@ -63,8 +63,7 @@ const create = () => {
 
         logger.info('OWASP Threat Dragon application started');
         return app;
-    }
-    catch (e) {
+    } catch (e) {
         if (!logger) { logger = console; }
         logger.error('OWASP Threat Dragon failed to start');
         logger.error(e.message);

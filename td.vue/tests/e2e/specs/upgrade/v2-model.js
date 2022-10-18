@@ -1,4 +1,4 @@
-describe('demo', () => {
+describe('upgrade v2 demo', () => {
     before(() => {
         cy.setupTest();
         cy.get('#local-login-btn').click();
@@ -9,16 +9,8 @@ describe('demo', () => {
         cy.contains('demo threat model from the list');
     });
 
-    it('has the Demo Threat Model', () => {
-        cy.contains('Demo Threat Model');
-    });
-
-    it('has the legacy desktop model', () => {
-        cy.contains('Legacy Desktop Model');
-    });
-
-    it('has the Legacy Model', () => {
-        cy.contains('Legacy Model');
+    it('has the V2 Demo Model', () => {
+        cy.contains('Version 2 Demo Model');
     });
 
     it('opens the v2 demo threat model', () => {

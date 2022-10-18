@@ -1,4 +1,4 @@
-import { BFormInput, BFormSelect, BFormTextarea, BModal, BootstrapVue } from 'bootstrap-vue';
+import { BFormInput, BFormRadioGroup, BFormSelect, BFormTextarea, BModal, BootstrapVue } from 'bootstrap-vue';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 
@@ -17,6 +17,9 @@ describe('components/ThreatEditModal.vue', () => {
         type: 'Information Disclosure',
         mitigation: 'we will mitigate it eventually',
         modelType: 'CIA',
+        new: false,
+        number: 0,
+        score: '',
         id: threatId
     });
 
@@ -47,15 +50,15 @@ describe('components/ThreatEditModal.vue', () => {
             modal = wrapper.findComponent(BModal);
             wrapper.vm.$refs.editModal.show = jest.fn();
             wrapper.vm.$refs.editModal.hide = jest.fn();
-            wrapper.vm.show(getThreatData().id);
+            wrapper.vm.showModal(getThreatData().id);
         });
 
         it('has a bootstrap modal', () => {
             expect(modal.exists()).toBe(true);
         });
 
-        it('uses threat edit as a title', () => {
-            expect(modal.attributes('title')).toEqual('threats.edit');
+        it.skip('uses threat edit as a title', () => {
+            expect(modal.attributes('title')).toEqual('Edit Threat #0');
         });
 
         it('shows the modal', () => {
@@ -75,14 +78,6 @@ describe('components/ThreatEditModal.vue', () => {
             expect(input.exists()).toEqual(true);
         });
 
-        it('has a model type input', () => {
-            const input = wrapper.findAllComponents(BFormSelect)
-                .filter(x => x.attributes('id') === 'model-type')
-                .at(0);
-
-            expect(input.exists()).toEqual(true);
-        });
-
         it('has a threat type input', () => {
             const input = wrapper.findAllComponents(BFormSelect)
                 .filter(x => x.attributes('id') === 'threat-type')
@@ -92,15 +87,23 @@ describe('components/ThreatEditModal.vue', () => {
         });
 
         it('has a status input', () => {
-            const input = wrapper.findAllComponents(BFormSelect)
+            const input = wrapper.findAllComponents(BFormRadioGroup)
                 .filter(x => x.attributes('id') === 'status')
                 .at(0);
 
             expect(input.exists()).toEqual(true);
         });
 
+        it('has a score input', () => {
+            const input = wrapper.findAllComponents(BFormInput)
+                .filter(x => x.attributes('id') === 'score')
+                .at(0);
+
+            expect(input.exists()).toEqual(true);
+        });
+
         it('has a priority input', () => {
-            const input = wrapper.findAllComponents(BFormSelect)
+            const input = wrapper.findAllComponents(BFormRadioGroup)
                 .filter(x => x.attributes('id') === 'priority')
                 .at(0);
 
@@ -147,7 +150,7 @@ describe('components/ThreatEditModal.vue', () => {
                 dataChanged.updateStyleAttrs = jest.fn();
                 mockStore.dispatch = jest.fn();
                 wrapper.vm.$refs.editModal.show = jest.fn();
-                await wrapper.vm.show(threatId);
+                await wrapper.vm.showModal(threatId);
                 await wrapper.vm.confirmDelete();
             }); 
 
@@ -169,14 +172,15 @@ describe('components/ThreatEditModal.vue', () => {
         });
     });
 
-    describe('updateData', () => {
+    describe('updateThreat', () => {
         beforeEach(() => {
             wrapper = getWrapper();
             wrapper.vm.$refs.editModal.show = jest.fn();
+            wrapper.vm.$refs.editModal.hide = jest.fn();
             mockStore.dispatch = jest.fn();
             dataChanged.updateStyleAttrs = jest.fn();
-            wrapper.vm.show(threatId);
-            wrapper.vm.updateData();
+            wrapper.vm.showModal(threatId);
+            wrapper.vm.updateThreat();
         });
 
         it('updates the data', () => {
@@ -185,21 +189,6 @@ describe('components/ThreatEditModal.vue', () => {
 
         it('updates the styles', () => {
             expect(dataChanged.updateStyleAttrs).toHaveBeenCalledTimes(1);
-        });
-    });
-
-    describe('updateData after delete', () => {
-        beforeEach(() => {
-            wrapper = getWrapper();
-            wrapper.vm.$refs.editModal.show = jest.fn();
-            mockStore.dispatch = jest.fn();
-            dataChanged.updateStyleAttrs = jest.fn();
-            wrapper.vm.show('fake');
-            wrapper.vm.updateData();
-        });
-
-        it('does not update the data', () => {
-            expect(mockStore.dispatch).not.toHaveBeenCalled();
         });
     });
 });

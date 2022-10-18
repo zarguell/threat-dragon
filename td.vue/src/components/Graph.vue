@@ -78,7 +78,7 @@ export default {
             stencil.get(this.graph, this.$refs.stencil_container);
         },
         threatSelected(threatId) {
-            this.$refs.threatEditModal.show(threatId);
+            this.$refs.threatEditModal.showModal(threatId);
         },
         saved() {
             const updated = Object.assign({}, this.diagram);
@@ -87,8 +87,8 @@ export default {
             this.$store.dispatch(tmActions.save);
         },
         async closed() {
-            const dataChanged = JSON.stringify(this.graph.toJSON().cells) !== JSON.stringify(this.diagram.cells);
-            if (!dataChanged || await this.getConfirmModal()) {
+            const diagramChanged = JSON.stringify(this.graph.toJSON().cells) !== JSON.stringify(this.diagram.cells);
+            if (!diagramChanged || await this.getConfirmModal()) {
                 this.$router.push({ name: `${this.providerType}ThreatModel`, params: this.$route.params });
             }
         },

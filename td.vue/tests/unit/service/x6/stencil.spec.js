@@ -52,7 +52,8 @@ describe('service/x6/stencil.js', () => {
         });
     });
 
-    describe('search', () => {
+    // TODO skip this test until the search function is back in, issues #194 and #454
+    describe.skip('search', () => {
         it('returns true for a matching shape regardless of case', () => {
             expect(cfg.search({ shape: 'MYSHAPE' }, 'mys')).toEqual(true);
         });
@@ -68,14 +69,15 @@ describe('service/x6/stencil.js', () => {
         it('returns false for unmatched labels and shapes', () => {
             expect(cfg.search({ shape: 'MYSHAPE', label: 'MYLABEL' }, 'foobar')).toEqual(false);
         });
-    });
 
-    it('has a placeholder', () => {
-        expect(cfg.placeholder).toEqual('Search');
-    });
+        it('has a placeholder', () => {
+            expect(cfg.placeholder).toEqual('Search');
+        });
+    
+        it('has notFoundText', () => {
+            expect(cfg.notFoundText).toContain('want to open an issue?');
+        });
 
-    it('has notFoundText', () => {
-        expect(cfg.notFoundText).toContain('want to open an issue?');
     });
 
     it('creates an instance of TrustBoundaryBox', () => {
@@ -100,7 +102,7 @@ describe('service/x6/stencil.js', () => {
             expect.any(shapes.StoreShape),
             expect.any(shapes.ActorShape),
             expect.any(shapes.FlowStencil)
-        ], 'entities');
+        ], 'components');
     });
 
     it('loads the trust boundaries', () => {

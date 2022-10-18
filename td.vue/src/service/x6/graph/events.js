@@ -27,7 +27,7 @@ const removeCellTools = ({ cell }) => {
 };
 
 const mouseEnter = ({ cell }) => {
-    const tools = [ 'boundary', 'button-remove' ];
+    const tools = ['boundary', 'button-remove'];
     if (!cell.isNode()) {
         tools.push('vertices');
         tools.push('source-arrowhead');
@@ -59,6 +59,10 @@ const cellAdded = (graph) => ({ cell }) => {
     }
 
     removeCellTools({ cell });
+    // boundary boxes must not overlap other diagram components
+    if (cell.shape === 'trust-boundary-box') {
+        cell.zIndex = -1;
+    }
 
     dataChanged.updateStyleAttrs(cell);
     if (!cell.data) {
@@ -93,7 +97,7 @@ const cellUnselected = ({ cell }) => {
     } else {
         console.log('Cannot set name');
     }
-    
+
     store.get().dispatch(CELL_UNSELECTED);
     dataChanged.updateStyleAttrs(cell);
 };

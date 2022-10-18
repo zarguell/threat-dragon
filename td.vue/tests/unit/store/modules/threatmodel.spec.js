@@ -10,7 +10,8 @@ import {
     THREATMODEL_FETCH_ALL,
     THREATMODEL_SAVE,
     THREATMODEL_SELECTED,
-    THREATMODEL_SET_IMMUTABLE_COPY
+    THREATMODEL_SET_IMMUTABLE_COPY,
+    THREATMODEL_UPDATE
 } from '@/store/actions/threatmodel.js';
 import threatmodelModule, { clearState } from '@/store/modules/threatmodel.js';
 import threatmodelApi from '@/service/api/threatmodelApi.js';
@@ -255,6 +256,12 @@ describe('store/modules/threatmodel.js', () => {
                 });
             });
         });
+
+        it('commits the diagram update action', () => {
+            const update = { foo: 'bar' };
+            threatmodelModule.actions[THREATMODEL_UPDATE](mocks, update);
+            expect(mocks.commit).toHaveBeenCalledWith(THREATMODEL_UPDATE, update);
+        });
     });
 
     describe('mutations', () => {
@@ -392,6 +399,14 @@ describe('store/modules/threatmodel.js', () => {
             });
         });
 
+        describe('update', () => {
+            it('updates the threat model', () => {
+                const update = { version: 'bar' };
+                threatmodelModule.mutations[THREATMODEL_UPDATE](threatmodelModule.state, update);
+                expect(threatmodelModule.state.data.version).toEqual('bar');
+            });
+        });
+
         it('sets the immutable copy from the data', () => {
             threatmodelModule.state.data = { foo: 'bar' };
             threatmodelModule.mutations[THREATMODEL_SET_IMMUTABLE_COPY](threatmodelModule.state);
@@ -459,6 +474,11 @@ describe('store/modules/threatmodel.js', () => {
             it('returns false when the version is set to 2.0', () => {
                 const state = { data: { version: '2.0' }};
                 expect(threatmodelModule.getters.isV1Model(state)).toEqual(false);
+            });
+
+            it('returns true when the version is set to 1.6.1', () => {
+                const state = { data: { version: '1.6.1' }};
+                expect(threatmodelModule.getters.isV1Model(state)).toEqual(true);
             });
 
             it('returns true when the version is not set', () => {
